@@ -114,11 +114,12 @@ pub async fn toggle_system_monitor_window(
     if let Some(w) = app.get_webview_window(WINDOW_LABEL) {
         let _ = w.show();
         let _ = w.set_always_on_top(true);
+        let _ = w.set_ignore_cursor_events(true);
         reposition_window(&w, &pos_mode, offset);
         return Ok(());
     }
 
-    // Create the companion overlay window
+    // Create the companion overlay window (always-on-top, click-through, non-focusable)
     let builder = WebviewWindowBuilder::new(
         &app,
         WINDOW_LABEL,
@@ -132,12 +133,15 @@ pub async fn toggle_system_monitor_window(
     .shadow(false)
     .always_on_top(true)
     .skip_taskbar(true)
-    .resizable(false);
+    .resizable(false)
+    .focusable(false)
+    .accept_first_mouse(false);
 
     let window = builder.build().map_err(|e| e.to_string())?;
     reposition_window(&window, &pos_mode, offset);
     let _ = window.show();
     let _ = window.set_always_on_top(true);
+    let _ = window.set_ignore_cursor_events(true);
 
     Ok(())
 }

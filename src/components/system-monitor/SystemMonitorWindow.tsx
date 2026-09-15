@@ -17,10 +17,7 @@ export const SystemMonitorWindow: React.FC = () => {
   }, []);
 
   return (
-    <div
-      data-tauri-drag-region
-      className="w-full h-full flex items-center justify-end bg-transparent overflow-hidden select-none m-0 p-0"
-    >
+    <div className="w-full h-full flex items-center justify-end bg-transparent overflow-hidden select-none m-0 p-0 pointer-events-none">
       <SystemMonitorBar
         showCpu={settings?.system_monitor_show_cpu ?? true}
         showRam={settings?.system_monitor_show_ram ?? true}

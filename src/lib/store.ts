@@ -43,7 +43,7 @@ const defaults: StoredSettings = {
   minimize_to_tray: false,
   launch_at_startup: false,
   sidebar_collapsed: false,
-  system_monitor_enabled: false,
+  system_monitor_enabled: true,
   system_monitor_show_cpu: true,
   system_monitor_show_ram: true,
   system_monitor_show_network: true,

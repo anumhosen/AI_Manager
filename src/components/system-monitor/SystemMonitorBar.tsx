@@ -64,12 +64,9 @@ export const SystemMonitorBar: React.FC<SystemMonitorBarProps> = ({
 
   return (
     <div
-      data-tauri-drag-region={isOverlay ? true : undefined}
-      onDoubleClick={handleDoubleClick}
       className={`inline-flex items-center px-1 py-0 select-none bg-transparent border-0 outline-none h-[40px] ${
-        isOverlay ? "drag-region cursor-pointer" : ""
+        isOverlay ? "pointer-events-none" : ""
       }`}
-      title={isOverlay ? "AI Task Manager Monitor — Double-click to open Task Manager" : undefined}
     >
       {/* CPU Core Graph (Wider bars, 36px height) */}
       {showCpu && (

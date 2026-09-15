@@ -123,13 +123,14 @@ pub fn run() {
         })
         .on_window_event(|window, event| {
             // Feature: Minimize to tray on close if setting is enabled.
-            // We read from the Tauri store synchronously is not possible here,
-            // so we default to hiding the window rather than quitting.
-            // The frontend toggles actual quit behavior via `minimize_to_tray` setting.
+            // System monitor window stays running on the taskbar.
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
-                // Hide the window to tray instead of destroying it
-                let _ = window.hide();
-                api.prevent_close();
+                if window.label() == "main" {
+                    let _ = window.hide();
+                    api.prevent_close();
+                } else if window.label() == "system_monitor" {
+                    api.prevent_close();
+                }
             }
         })
         .run(tauri::generate_context!())
