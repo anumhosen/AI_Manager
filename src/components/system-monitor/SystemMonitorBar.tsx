@@ -43,17 +43,6 @@ export const SystemMonitorBar: React.FC<SystemMonitorBarProps> = ({
       clearInterval(interval);
     };
   }, [externalMetrics, intervalMs]);
-
-  const handleDoubleClick = async () => {
-    if (isOverlay) {
-      try {
-        await ipc.focusMainWindow();
-      } catch (err) {
-        console.warn("Failed to focus main window:", err);
-      }
-    }
-  };
-
   const data = externalMetrics ?? internalMetrics;
 
   const cpuCores = data?.cpu_cores ?? [0, 0, 0, 0];
