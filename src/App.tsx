@@ -10,6 +10,7 @@ import { AiInsights } from "./pages/AiInsights";
 import { Settings } from "./pages/Settings";
 import { ipc, type MetricSample, type ProcessRow, type SystemSnapshot } from "./lib/ipc";
 import { loadSettings, saveSettings, type StoredSettings } from "./lib/store";
+import { SystemMonitorWindow } from "./components/system-monitor/SystemMonitorWindow";
 
 export type Route =
   | "dashboard"
@@ -22,6 +23,14 @@ export type Route =
   | "settings";
 
 export function App() {
+  const isMonitorWindow =
+    typeof window !== "undefined" &&
+    window.location.search.includes("window=monitor");
+
+  if (isMonitorWindow) {
+    return <SystemMonitorWindow />;
+  }
+
   const [route, setRoute] = useState<Route>("dashboard");
   const [processes, setProcesses] = useState<ProcessRow[]>([]);
   const [history, setHistory] = useState<MetricSample[]>([]);
@@ -34,6 +43,16 @@ export function App() {
     loadSettings().then((loaded) => {
       setSettings(loaded);
       document.documentElement.dataset.theme = loaded.theme;
+      // If enabled, ensure companion overlay is opened
+      if (loaded.system_monitor_enabled) {
+        ipc
+          .toggleSystemMonitorWindow(
+            true,
+            loaded.system_monitor_position,
+            loaded.system_monitor_offset_right
+          )
+          .catch(() => {});
+      }
     });
   }, []);
 
@@ -102,6 +121,19 @@ export function App() {
 
   const handleSettingsChange = (updated: StoredSettings) => {
     document.documentElement.dataset.theme = updated.theme;
+    if (
+      updated.system_monitor_enabled !== settings.system_monitor_enabled ||
+      updated.system_monitor_position !== settings.system_monitor_position ||
+      updated.system_monitor_offset_right !== settings.system_monitor_offset_right
+    ) {
+      ipc
+        .toggleSystemMonitorWindow(
+          updated.system_monitor_enabled,
+          updated.system_monitor_position,
+          updated.system_monitor_offset_right
+        )
+        .catch(() => {});
+    }
     setSettings(updated);
     saveSettings(updated);
   };

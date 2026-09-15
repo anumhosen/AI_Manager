@@ -23,6 +23,14 @@ export type StoredSettings = {
   launch_at_startup: boolean;
   // UI State
   sidebar_collapsed: boolean;
+  // Feature: System Monitor Bar
+  system_monitor_enabled: boolean;
+  system_monitor_show_cpu: boolean;
+  system_monitor_show_ram: boolean;
+  system_monitor_show_network: boolean;
+  system_monitor_position: "taskbar_bottom" | "taskbar_top" | "top_left" | "top_right";
+  system_monitor_offset_right: number;
+  system_monitor_interval_ms: number;
 };
 
 const defaults: StoredSettings = {
@@ -35,6 +43,13 @@ const defaults: StoredSettings = {
   minimize_to_tray: false,
   launch_at_startup: false,
   sidebar_collapsed: false,
+  system_monitor_enabled: false,
+  system_monitor_show_cpu: true,
+  system_monitor_show_ram: true,
+  system_monitor_show_network: true,
+  system_monitor_position: "taskbar_bottom",
+  system_monitor_offset_right: 240,
+  system_monitor_interval_ms: 1000,
 };
 
 export async function loadSettings(): Promise<StoredSettings> {

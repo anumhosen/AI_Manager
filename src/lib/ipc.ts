@@ -112,6 +112,15 @@ export type NetConnection = {
 // Feature: Historical Metrics Storage
 export type MetricRange = "1h" | "24h" | "7d";
 
+// Feature: System Monitor Bar
+export type SystemMonitorMetrics = {
+  cpu_cores: number[];
+  ram_percent: number;
+  ram_history: number[];
+  net_rx_bps: number;
+  net_tx_bps: number;
+};
+
 export const ipc = {
   listProcesses: () => invoke<ProcessRow[]>("list_processes"),
   killProcess: (pid: number) => invoke<boolean>("kill_process", { pid }),
@@ -146,4 +155,24 @@ export const ipc = {
   // Feature: System Tray
   setAutostart: (enabled: boolean) =>
     invoke<void>("set_autostart", { enabled }),
+
+  // Feature: System Monitor Bar
+  systemMonitorMetrics: () =>
+    invoke<SystemMonitorMetrics>("system_monitor_metrics"),
+  toggleSystemMonitorWindow: (
+    enable: boolean,
+    positionMode?: string,
+    offsetRight?: number
+  ) =>
+    invoke<void>("toggle_system_monitor_window", {
+      enable,
+      positionMode: positionMode ?? null,
+      offsetRight: offsetRight ?? null,
+    }),
+  repositionSystemMonitor: (positionMode: string, offsetRight?: number) =>
+    invoke<void>("reposition_system_monitor", {
+      positionMode,
+      offsetRight: offsetRight ?? null,
+    }),
+  focusMainWindow: () => invoke<void>("focus_main_window"),
 };

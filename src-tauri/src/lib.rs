@@ -65,6 +65,11 @@ pub fn run() {
             // Tray / Autostart
             commands::tray::set_autostart,
             commands::tray::get_autostart_state,
+            // System Monitor Bar
+            commands::monitor::system_monitor_metrics,
+            commands::monitor::toggle_system_monitor_window,
+            commands::monitor::reposition_system_monitor,
+            commands::monitor::focus_main_window,
         ])
         .setup(|app| {
             #[cfg(debug_assertions)]
