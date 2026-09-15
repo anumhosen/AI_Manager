@@ -24,6 +24,23 @@
         "transparent": false,
         "shadow": true,
         "center": true
+      },
+      {
+        "title": "System Monitor",
+        "label": "system_monitor",
+        "url": "/?window=monitor",
+        "width": 260,
+        "height": 40,
+        "minWidth": 200,
+        "minHeight": 32,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "focusable": false,
+        "visible": false
       }
     ],
     "security": {
