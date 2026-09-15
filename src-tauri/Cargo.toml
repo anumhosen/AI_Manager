@@ -42,6 +42,7 @@ winreg = "0.55"
 windows = { version = "0.58", features = [
   "Win32_Foundation",
   "Win32_System_Services",
+  "Win32_UI_WindowsAndMessaging",
   # Feature 2: Network Connections — IP Helper API
   "Win32_NetworkManagement_IpHelper",
   "Win32_Networking_WinSock",

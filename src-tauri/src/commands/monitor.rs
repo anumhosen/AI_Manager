@@ -89,8 +89,56 @@ fn reposition_window(window: &WebviewWindow, position_mode: &str, offset_right: 
         };
 
         let _ = window.set_position(PhysicalPosition::new(x, y));
+        enforce_taskbar_topmost(window);
     }
 }
+
+#[cfg(windows)]
+pub fn enforce_taskbar_topmost(window: &WebviewWindow) {
+    use windows::core::w;
+    use windows::Win32::Foundation::HWND;
+    use windows::Win32::UI::WindowsAndMessaging::{
+        FindWindowW, GetWindowLongPtrW, SetWindowLongPtrW, SetWindowPos, GWLP_HWNDPARENT,
+        GWL_EXSTYLE, HWND_TOPMOST, SWP_NOACTIVATE, SWP_NOMOVE, SWP_NOSIZE, SWP_SHOWWINDOW,
+        WS_EX_NOACTIVATE, WS_EX_TOOLWINDOW, WS_EX_TOPMOST,
+    };
+
+    if let Ok(raw_hwnd) = window.hwnd() {
+        let hwnd = HWND(raw_hwnd.0 as _);
+        unsafe {
+            if let Ok(tray_hwnd) = FindWindowW(w!("Shell_TrayWnd"), None) {
+                if !tray_hwnd.0.is_null() {
+                    // Set the Taskbar as the owner window of our overlay.
+                    // In Win32, an owned window ALWAYS sits above its owner in Z-order,
+                    // preventing the taskbar from covering it when the user clicks the taskbar.
+                    SetWindowLongPtrW(hwnd, GWLP_HWNDPARENT, tray_hwnd.0 as isize);
+                }
+            }
+
+            let ex_style = GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
+            let target_ex_style = ex_style
+                | (WS_EX_TOOLWINDOW.0 as isize)
+                | (WS_EX_TOPMOST.0 as isize)
+                | (WS_EX_NOACTIVATE.0 as isize);
+            if ex_style != target_ex_style {
+                SetWindowLongPtrW(hwnd, GWL_EXSTYLE, target_ex_style);
+            }
+
+            let _ = SetWindowPos(
+                hwnd,
+                HWND_TOPMOST,
+                0,
+                0,
+                0,
+                0,
+                SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW,
+            );
+        }
+    }
+}
+
+#[cfg(not(windows))]
+pub fn enforce_taskbar_topmost(_window: &WebviewWindow) {}
 
 #[tauri::command]
 pub async fn toggle_system_monitor_window(
@@ -116,6 +164,7 @@ pub async fn toggle_system_monitor_window(
         let _ = w.set_always_on_top(true);
         let _ = w.set_ignore_cursor_events(true);
         reposition_window(&w, &pos_mode, offset);
+        enforce_taskbar_topmost(&w);
         return Ok(());
     }
 
@@ -136,7 +185,7 @@ pub async fn toggle_system_monitor_window(
     .focusable(false)
     .accept_first_mouse(false);
 
-    #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
+    #[cfg(not(target_os = "macos"))]
     let builder = builder.transparent(true);
 
     let window = builder.build().map_err(|e| e.to_string())?;
@@ -144,6 +193,7 @@ pub async fn toggle_system_monitor_window(
     let _ = window.show();
     let _ = window.set_always_on_top(true);
     let _ = window.set_ignore_cursor_events(true);
+    enforce_taskbar_topmost(&window);
 
     Ok(())
 }
