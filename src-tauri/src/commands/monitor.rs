@@ -129,13 +129,15 @@ pub async fn toggle_system_monitor_window(
     .inner_size(260.0, 40.0)
     .min_inner_size(200.0, 32.0)
     .decorations(false)
-    .transparent(true)
     .shadow(false)
     .always_on_top(true)
     .skip_taskbar(true)
     .resizable(false)
     .focusable(false)
     .accept_first_mouse(false);
+
+    #[cfg(any(not(target_os = "macos"), feature = "macos-private-api"))]
+    let builder = builder.transparent(true);
 
     let window = builder.build().map_err(|e| e.to_string())?;
     reposition_window(&window, &pos_mode, offset);
