@@ -158,9 +158,8 @@ def collect_files(
     # Use os.walk to get all files, respecting ignore dirs
     for dirpath, dirnames, filenames in os.walk(root, topdown=True):
         # Modify dirnames in-place to skip ignored directories
-        dirnames[:] = [d for d in dirnames if d not in IGNORE_DIRS]
-        # Record which ignore dirs were skipped
         skipped = set(dirnames) & IGNORE_DIRS
+        dirnames[:] = [d for d in dirnames if d not in IGNORE_DIRS]
         result["ignored_dirs"].update(skipped)
 
         rel_dir = Path(dirpath).relative_to(root)

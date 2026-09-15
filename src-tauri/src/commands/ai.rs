@@ -213,10 +213,9 @@ async fn gemini_chat(
     });
 
     let url = format!(
-        "{}/models/{}:generateContent?key={}",
+        "{}/models/{}:generateContent",
         base_url.trim_end_matches('/'),
-        model,
-        api_key
+        model
     );
 
     let resp = reqwest::Client::builder()
@@ -224,6 +223,7 @@ async fn gemini_chat(
         .build()
         .map_err(|e| format!("client: {e}"))?
         .post(&url)
+        .header("x-goog-api-key", api_key)
         .json(&body)
         .send()
         .await

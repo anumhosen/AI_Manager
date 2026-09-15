@@ -30,7 +30,7 @@ pub fn set_autostart(
             // Get the current executable path
             let exe_path = std::env::current_exe()
                 .map_err(|e| format!("Cannot determine exe path: {e}"))?;
-            let exe_str = exe_path.to_string_lossy().to_string();
+            let exe_str = format!("\"{}\"", exe_path.to_string_lossy());
             run_key
                 .set_value(APP_NAME, &exe_str)
                 .map_err(|e| format!("Failed to set autostart registry value: {e}"))?;

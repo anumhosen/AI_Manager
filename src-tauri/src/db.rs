@@ -89,9 +89,8 @@ impl MetricsDb {
             |r| r.get(0),
         )?;
 
-        // Compute stride for downsampling
         let stride = if count as usize > max_points {
-            count as usize / max_points
+            (count as usize + max_points - 1) / max_points
         } else {
             1
         };

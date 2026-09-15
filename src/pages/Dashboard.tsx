@@ -25,7 +25,11 @@ export function Dashboard(props: {
 
   const cpuPct = last?.cpu_total ?? snapshot?.cpu_total ?? 0;
   const memPct =
-    last && last.mem_total > 0 ? (last.mem_used / last.mem_total) * 100 : 0;
+    last && last.mem_total > 0
+       ? (last.mem_used / last.mem_total) * 100
+       : snapshot && snapshot.mem_total > 0
+       ? (snapshot.mem_used / snapshot.mem_total) * 100
+       : 0;
   const memUsed = last?.mem_used ?? snapshot?.mem_used ?? 0;
   const memTotal = last?.mem_total ?? snapshot?.mem_total ?? 1;
 

@@ -52,7 +52,7 @@ mod win_net {
     }
 
     fn fmt_ipv4_port(addr: u32, port: u32) -> String {
-        let ip = Ipv4Addr::from(addr.to_be_bytes());
+        let ip = Ipv4Addr::from(addr.to_ne_bytes());
         let p = u16::from_be(port as u16);
         format!("{}:{}", ip, p)
     }
