@@ -14,11 +14,11 @@
       {
         "title": "AI Task Manager",
         "label": "main",
-        "width": 1280,
-        "height": 820,
+        "width": 1024,
+        "height": 720,
         "minWidth": 960,
         "minHeight": 600,
-        "decorations": true,
+        "decorations": false,
         "resizable": true,
         "fullscreen": false,
         "transparent": false,
@@ -27,7 +27,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost https://openrouter.ai https://api.openrouter.ai http://localhost:11434"
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' ipc: http://ipc.localhost https://openrouter.ai https://api.openrouter.ai https://api.openai.com https://api.anthropic.com https://generativelanguage.googleapis.com http://localhost:11434 http://localhost:1234"
     }
   },
   "bundle": {

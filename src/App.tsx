@@ -1,24 +1,28 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Shell } from "./components/Shell";
+import { Dashboard } from "./pages/Dashboard";
 import { Processes } from "./pages/Processes";
 import { Performance } from "./pages/Performance";
+import { History } from "./pages/History";
 import { Startup } from "./pages/Startup";
 import { Services } from "./pages/Services";
 import { AiInsights } from "./pages/AiInsights";
 import { Settings } from "./pages/Settings";
 import { ipc, type MetricSample, type ProcessRow, type SystemSnapshot } from "./lib/ipc";
-import { loadSettings, type StoredSettings } from "./lib/store";
+import { loadSettings, saveSettings, type StoredSettings } from "./lib/store";
 
 export type Route =
+  | "dashboard"
   | "processes"
   | "performance"
+  | "history"
   | "startup"
   | "services"
   | "ai"
   | "settings";
 
 export function App() {
-  const [route, setRoute] = useState<Route>("processes");
+  const [route, setRoute] = useState<Route>("dashboard");
   const [processes, setProcesses] = useState<ProcessRow[]>([]);
   const [history, setHistory] = useState<MetricSample[]>([]);
   const [snapshot, setSnapshot] = useState<SystemSnapshot | null>(null);
@@ -27,7 +31,10 @@ export function App() {
   const timer = useRef<number | null>(null);
 
   useEffect(() => {
-    loadSettings().then(setSettings);
+    loadSettings().then((loaded) => {
+      setSettings(loaded);
+      document.documentElement.dataset.theme = loaded.theme;
+    });
   }, []);
 
   const refresh = useCallback(async () => {
@@ -78,6 +85,27 @@ export function App() {
     setRoute("ai");
   };
 
+  const handleToggleSidebar = () => {
+    const nextCollapsed = !settings.sidebar_collapsed;
+    const nextSettings = { ...settings, sidebar_collapsed: nextCollapsed };
+    setSettings(nextSettings);
+    saveSettings(nextSettings);
+  };
+
+  const handleToggleTheme = () => {
+    const nextTheme = settings.theme === "dark" ? "light" : "dark";
+    document.documentElement.dataset.theme = nextTheme;
+    const nextSettings = { ...settings, theme: nextTheme as "dark" | "light" };
+    setSettings(nextSettings);
+    saveSettings(nextSettings);
+  };
+
+  const handleSettingsChange = (updated: StoredSettings) => {
+    document.documentElement.dataset.theme = updated.theme;
+    setSettings(updated);
+    saveSettings(updated);
+  };
+
   return (
     <Shell
       route={route}
@@ -85,7 +113,20 @@ export function App() {
       cpuPct={cpuPct}
       memPct={memPct}
       procCount={snapshot?.process_count ?? processes.length}
+      refreshHz={settings.refresh_hz}
+      sidebarCollapsed={settings.sidebar_collapsed}
+      onToggleSidebar={handleToggleSidebar}
+      theme={settings.theme}
+      onToggleTheme={handleToggleTheme}
     >
+      {route === "dashboard" ? (
+        <Dashboard
+          processes={processes}
+          snapshot={snapshot}
+          history={history}
+          onNavigate={(r) => setRoute(r as Route)}
+        />
+      ) : null}
       {route === "processes" ? (
         <Processes
           processes={processes}
@@ -97,6 +138,7 @@ export function App() {
       {route === "performance" ? (
         <Performance history={history} snapshot={snapshot} />
       ) : null}
+      {route === "history" ? <History /> : null}
       {route === "startup" ? <Startup /> : null}
       {route === "services" ? <Services /> : null}
       {route === "ai" ? (
@@ -110,7 +152,7 @@ export function App() {
         />
       ) : null}
       {route === "settings" ? (
-        <Settings settings={settings} onChange={setSettings} />
+        <Settings settings={settings} onChange={handleSettingsChange} />
       ) : null}
     </Shell>
   );
